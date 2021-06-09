@@ -4,8 +4,7 @@ const express = require('express');
 const socketio = require('socket.io');
 const moment = require('moment');
 const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://admin-ayush:admin@cluster0.alwdd.mongodb.net/usersDB', {useNewUrlParser: true, useUnifiedTopology: true})
-
+mongoose.connect('mongodb+srv://AshutoshJaiswalAdmin:abcd123@ashutoshj.akapr.mongodb.net/usersDB?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true})
 
 const userSchema = new mongoose.Schema(
   {
