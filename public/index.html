@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
+			integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
+			crossorigin="anonymous"
+		/>
+		<link rel="stylesheet" href="css/indexStyle.css" />
+		<title>COE Messaging App</title>
+		<link rel = "icon" href ="https://lh3.googleusercontent.com/pw/ACtC-3eOodNS4-awUVy4mwQlpp3SFQwP8vV6dacl4GKvCl-MR6tOrVpBa5BNvpPeCvRwnq0yo-M0By4Eru6f1dQr4jBDehRVNiPwkUQn3I3qiEA2eII7vhM95QENm1-R1UMtu3rlgdcr0dTSi3nWjcsrE1k9=w480-h512-no?authuser=1" type = "image/x-icon">
+		
+		<script>
+			function addRoom(e) {
+			     if(e.value=="default"){
+					var value = window.prompt("Enter room name");
+					var x = document.createElement("OPTION")
+					x.value=value;
+					x.text=value;
+					room.insertBefore(x, room.children[room.length-1]);
+				 }
+				}
+		</script>
+	</head>
+	<body>
+		<div class="join-container">
+			<header class="join-header">
+				<h1 class="glow"><i class="fas fa-dice-d20"></i><em> COE :<span style="font-weight: 500; font-size: 0.5em;"> Chat Online for Engineers</span></em></h1>
+			</header>
+			<main class="join-main">
+				<form action="chat.html">
+					<div class="form-control">
+						<label for="username">U s e r n a m e :</label>
+						<input
+							type="text"
+							name="username"
+							id="username"
+							placeholder="Enter your Username ..."
+							autocomplete="off"
+							autofocus
+							required
+						/>
+					</div>
+					<div class="form-control">
+						<label for="room">R o o m :</label>
+						<select name="room" id="room" onchange="addRoom(this)" required>
+							<option value="COE" selected disabled hidden>Choose Room to Join</option>
+							<option value="COE">COE</option>
+							<option value="IT">IT</option>
+							<option value="MAC">MAC</option>
+							<option value="ECE">ECE</option>
+							<option value="MECH">MECH</option>
+							<option value="ICE">ICE</option>
+							<option value="default" style="color: forestgreen;">&#128397; Create a Room</option>
+						</select>
+					</div>
+					<button type="submit" class="btn">Join Chat <i class="fas fa-sign-in-alt"></i></button>
+				</form>
+			</main>
+		</div>
+	</body>
+</html>
