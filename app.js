@@ -4,7 +4,7 @@ const express = require('express');
 const socketio = require('socket.io');
 const moment = require('moment');
 const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://AshutoshJaiswalAdmin:abcd123@ashutoshj.akapr.mongodb.net/usersDB?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true})
+mongoose.connect('mongodb://AshutoshJaiswalAdmin:abcd1234@ashutoshj-shard-00-00.akapr.mongodb.net:27017,ashutoshj-shard-00-01.akapr.mongodb.net:27017,ashutoshj-shard-00-02.akapr.mongodb.net:27017/usersDB?ssl=true&replicaSet=atlas-u4q7t7-shard-0&authSource=admin&retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true})
 
 const userSchema = new mongoose.Schema(
   {
