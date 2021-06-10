@@ -6,6 +6,23 @@ const moment = require('moment');
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://AshutoshJaiswalAdmin:abcd1234@ashutoshj-shard-00-00.akapr.mongodb.net:27017,ashutoshj-shard-00-01.akapr.mongodb.net:27017,ashutoshj-shard-00-02.akapr.mongodb.net:27017/usersDB?ssl=true&replicaSet=atlas-u4q7t7-shard-0&authSource=admin&retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true})
 
+// console.log(mongoose.connection.readyState); //logs 0
+mongoose.connection.on('connecting', () => { 
+  console.log('connecting')
+  console.log(mongoose.connection.readyState); //logs 2
+});
+mongoose.connection.on('connected', () => {
+  console.log('connected');
+  console.log(mongoose.connection.readyState); //logs 1
+});
+mongoose.connection.on('disconnecting', () => {
+  console.log('disconnecting');
+  console.log(mongoose.connection.readyState); // logs 3
+});
+mongoose.connection.on('disconnected', () => {
+  console.log('disconnected');
+  console.log(mongoose.connection.readyState); //logs 0
+});
 const userSchema = new mongoose.Schema(
   {
     id : String,
