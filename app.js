@@ -4,7 +4,8 @@ const express = require('express');
 const socketio = require('socket.io');
 const moment = require('moment');
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://AshutoshAdmin:abcd1234@ashutoshwebchatapp-shard-00-00.ovcla.mongodb.net:27017,ashutoshwebchatapp-shard-00-01.ovcla.mongodb.net:27017,ashutoshwebchatapp-shard-00-02.ovcla.mongodb.net:27017/?ssl=true&replicaSet=atlas-g8bqwp-shard-0&authSource=admin&retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true})
+// mongoose.connect('mongodb://AshutoshAdmin:abcd1234@ashutoshwebchatapp-shard-00-00.ovcla.mongodb.net:27017,ashutoshwebchatapp-shard-00-01.ovcla.mongodb.net:27017,ashutoshwebchatapp-shard-00-02.ovcla.mongodb.net:27017/?ssl=true&replicaSet=atlas-g8bqwp-shard-0&authSource=admin&retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true})
+mongoose.connect('mongodb+srv://AshutoshAdmin:abcd1234@ashutoshwebchatapp.cxwdkvk.mongodb.net/?retryWrites=true&w=majority&appName=ashutoshWebChatApp', {useNewUrlParser: true, useUnifiedTopology: true})
 
 // console.log(mongoose.connection.readyState); //logs 0
 mongoose.connection.on('connecting', () => { 
