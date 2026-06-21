@@ -12,19 +12,7 @@
 		/>
 		<link rel="stylesheet" href="css/indexStyle.css" />
 		<title>COE Messaging App</title>
-		<link rel = "icon" href ="https://lh3.googleusercontent.com/pw/ACtC-3eOodNS4-awUVy4mwQlpp3SFQwP8vV6dacl4GKvCl-MR6tOrVpBa5BNvpPeCvRwnq0yo-M0By4Eru6f1dQr4jBDehRVNiPwkUQn3I3qiEA2eII7vhM95QENm1-R1UMtu3rlgdcr0dTSi3nWjcsrE1k9=w480-h512-no?authuser=1" type = "image/x-icon">
-		
-		<script>
-			function addRoom(e) {
-			     if(e.value=="default"){
-					var value = window.prompt("Enter room name");
-					var x = document.createElement("OPTION")
-					x.value=value;
-					x.text=value;
-					room.insertBefore(x, room.children[room.length-1]);
-				 }
-				}
-		</script>
+		<link rel="icon" href="https://lh3.googleusercontent.com/pw/ACtC-3eOodNS4-awUVy4mwQlpp3SFQwP8vV6dacl4GKvCl-MR6tOrVpBa5BNvpPeCvRwnq0yo-M0By4Eru6f1dQr4jBDehRVNiPwkUQn3I3qiEA2eII7vhM95QENm1-R1UMtu3rlgdcr0dTSi3nWjcsrE1k9=w480-h512-no?authuser=1" type="image/x-icon">
 	</head>
 	<body>
 		<div class="join-container">
@@ -32,35 +20,41 @@
 				<h1 class="glow"><i class="fas fa-dice-d20"></i><em> COE :<span style="font-weight: 500; font-size: 0.5em;"> Chat Online for Engineers</span></em></h1>
 			</header>
 			<main class="join-main">
-				<form action="chat.html">
+				<form action="chat.html" id="join-form">
 					<div class="form-control">
-						<label for="username">U s e r n a m e :</label>
+						<label for="username">Username:</label>
 						<input
 							type="text"
 							name="username"
 							id="username"
-							placeholder="Enter your Username ..."
+							placeholder="Enter your username..."
 							autocomplete="off"
 							autofocus
 							required
+							maxlength="30"
+							pattern="[a-zA-Z0-9_\-\s.]+"
+							title="Letters, numbers, spaces, dots, hyphens, underscores only"
 						/>
 					</div>
 					<div class="form-control">
-						<label for="room">R o o m :</label>
-						<select name="room" id="room" onchange="addRoom(this)" required>
-							<option value="COE" selected disabled hidden>Choose Room to Join</option>
-							<option value="COE">COE</option>
-							<option value="IT">IT</option>
-							<option value="MAC">MAC</option>
-							<option value="ECE">ECE</option>
-							<option value="MECH">MECH</option>
-							<option value="ICE">ICE</option>
+						<label for="room">Room:</label>
+						<select name="room" id="room" required>
+							<option value="" selected disabled hidden>Choose room to join</option>
+							<option value="COE" data-room="COE">COE</option>
+							<option value="IT" data-room="IT">IT</option>
+							<option value="MAC" data-room="MAC">MAC</option>
+							<option value="ECE" data-room="ECE">ECE</option>
+							<option value="MECH" data-room="MECH">MECH</option>
+							<option value="ICE" data-room="ICE">ICE</option>
 							<option value="default" style="color: forestgreen;">&#128397; Create a Room</option>
 						</select>
 					</div>
+					<p id="join-error" class="join-error hidden"></p>
 					<button type="submit" class="btn">Join Chat <i class="fas fa-sign-in-alt"></i></button>
 				</form>
 			</main>
 		</div>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="js/index.js"></script>
 	</body>
 </html>

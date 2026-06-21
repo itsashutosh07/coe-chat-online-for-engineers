@@ -3,161 +3,60 @@ require("dotenv").config();
 const path = require("path");
 const http = require("http");
 const express = require("express");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const socketio = require("socket.io");
-const moment = require("moment");
-const mongoose = require("mongoose");
+const connectDB = require("./config/db");
+const registerSocketHandlers = require("./socket/handlers");
 
-if (!process.env.MONGODB_URI) {
-  console.error("[DB] MONGODB_URI is not set");
-  process.exit(1);
-}
-
-const mongooseOptions = { useNewUrlParser: true, useUnifiedTopology: true };
-
-mongoose.connect(process.env.MONGODB_URI, mongooseOptions).catch((err) => {
-  console.error("[DB] Initial connection failed:", err.message);
-});
-
-mongoose.connection.on("connecting", () => {
-  console.log("connecting");
-  console.log(mongoose.connection.readyState);
-});
-mongoose.connection.on("connected", () => {
-  console.log("connected");
-  console.log(mongoose.connection.readyState);
-});
-mongoose.connection.on("error", (err) => {
-  console.error("[DB] Connection error:", err.message);
-});
-mongoose.connection.on("disconnecting", () => {
-  console.log("disconnecting");
-  console.log(mongoose.connection.readyState);
-});
-mongoose.connection.on("disconnected", () => {
-  console.log("disconnected");
-  console.log(mongoose.connection.readyState);
-});
-
-const userSchema = new mongoose.Schema({
-  id: String,
-  username: String,
-  room: String,
-});
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-const User = mongoose.model("User", userSchema);
+connectDB();
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdnjs.cloudflare.com",
+          "https://kit.fontawesome.com",
+        ],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://cdnjs.cloudflare.com",
+          "https://fonts.googleapis.com",
+        ],
+        fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+        imgSrc: ["'self'", "data:", "https://lh3.googleusercontent.com"],
+        connectSrc: ["'self'", "wss:", "ws:"],
+      },
+    },
+  })
+);
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
+
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", uptime: process.uptime() });
+});
 
 app.use(express.static(path.join(__dirname, "public")));
 
-const botName = "C.O.E. Bot";
-
-function formatMessage(username, text) {
-  return {
-    username,
-    text,
-    time: moment().format("h:mm a"),
-  };
-}
-
 io.on("connection", (socket) => {
-  socket.on("joinRoom", ({ username, room }) => {
-    const newUser = new User({
-      id: socket.id,
-      username: username,
-      room: room,
-    });
-
-    newUser.save(function (err, user) {
-      if (err || !user) {
-        console.error(
-          "[DB] joinRoom save failed:",
-          err?.message || "user undefined",
-          { socketId: socket.id, username, room }
-        );
-        return;
-      }
-
-      socket.join(user.room);
-
-      socket.emit("message", formatMessage(botName, "Welcome to C.O.E. !!"));
-
-      socket.broadcast
-        .to(user.room)
-        .emit(
-          "message",
-          formatMessage(botName, `${user.username} has joined the chat`)
-        );
-
-      User.find({ room: user.room }, function (findErr, res) {
-        if (findErr) {
-          console.error("[DB] joinRoom list users failed:", findErr.message, {
-            room: user.room,
-          });
-          return;
-        }
-        io.to(user.room).emit("roomUsers", {
-          room: user.room,
-          users: res,
-        });
-      });
-    });
-  });
-
-  socket.on("chatMessage", (msg) => {
-    User.findOne({ id: socket.id }, function (err, user) {
-      if (err) {
-        console.error("[DB] chatMessage lookup failed:", err.message, {
-          socketId: socket.id,
-        });
-        return;
-      }
-      if (user) {
-        io.to(user.room).emit("message", formatMessage(user.username, msg));
-      } else {
-        console.error("[DB] chatMessage: no user for socket", {
-          socketId: socket.id,
-        });
-        socket.disconnect();
-      }
-    });
-  });
-
-  socket.on("disconnect", () => {
-    User.findOneAndDelete({ id: socket.id }, function (err, user) {
-      if (err) {
-        console.error("[DB] disconnect delete failed:", err.message, {
-          socketId: socket.id,
-        });
-        return;
-      }
-      if (!user) {
-        console.error("[DB] disconnect: no user found for socket", {
-          socketId: socket.id,
-        });
-        return;
-      }
-
-      io.to(user.room).emit(
-        "message",
-        formatMessage(botName, `${user.username} has left the chat`)
-      );
-
-      User.find({ room: user.room }, function (findErr, res) {
-        if (findErr) {
-          console.error("[DB] disconnect list users failed:", findErr.message, {
-            room: user.room,
-          });
-          return;
-        }
-        io.to(user.room).emit("roomUsers", {
-          room: user.room,
-          users: res,
-        });
-      });
-    });
-  });
+  registerSocketHandlers(io, socket);
 });
 
 const PORT = process.env.PORT || 3000;

@@ -15,36 +15,32 @@ body {
 }
 
 .btn {
-    cursor: pointer;
-    font-size: 50px;
-    font-weight: 700;
+	cursor: pointer;
+	font-size: 50px;
+	font-weight: 700;
 	padding: 5px 15px;
 	background-color: rgb(89, 200, 45);
 	color: rgb(255, 255, 255);
 	border: 0;
 }
 
-.btn:hover{
+.btn:hover,
+.btn:focus {
+	outline: none;
 	background-color: #00eb00;
 }
 
-.btn:focus{
-    outline: none;
-    background-color: #00eb00;
+label {
+	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+	text-align: center;
+	text-transform: uppercase;
+	font-size: 1.1rem;
+	font-weight: 800;
 }
 
-/* Join Page */
-label{
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    text-align: center;
-    text-transform: uppercase;
-    font-size: 1.1rem;
-    font-weight: 800;
-}
 .join-container {
 	max-width: 500px;
 	margin: 80px auto;
-	color: rgb(19, 10, 10);
 }
 
 .join-header {
@@ -60,10 +56,6 @@ label{
 	background: #2f3136;
 }
 
-.join-main p {
-	margin-bottom: 20px;
-}
-
 .join-main .form-control {
 	margin-bottom: 20px;
 }
@@ -77,62 +69,77 @@ label{
 	font-size: 16px;
 	padding: 5px 20px;
 	height: 40px;
-    width: 100%;
-    background-color: black;
-    color: white;
-    border-radius: 30px;
+	width: 100%;
+	background-color: black;
+	color: white;
+	border-radius: 30px;
+	border: none;
 }
 
-input[type='text']:focus{
-    background-color: #202225;
-    outline: none;
+.join-main input[type='text']:focus {
+	background-color: #202225;
+	outline: none;
 }
 
 .join-main select {
 	font-size: 16px;
 	padding: 5px 15px;
 	height: 40px;
-    width: 100%;
-    color: white;
-    background-color: black;
-    border-radius: 30px;
+	width: 100%;
+	color: white;
+	background-color: black;
+	border-radius: 30px;
+	border: none;
 }
-select:focus{
-    background-color: #202225;
-    outline: none;
+
+.join-main select:focus {
+	background-color: #202225;
+	outline: none;
 }
 
 .join-main option {
-    color: #d13737;
-    opacity: unset;
-    background: transparent;
-    /* background-color: #202225; */
+	color: #d13737;
+	background: #2f3136;
 }
 
 .join-main .btn {
-    font-size: 16px;
+	font-size: 16px;
 	padding: 5px 15px;
-	height: 40px;       
+	height: 40px;
 	margin-top: 20px;
-    width: 100%;
-    border-radius: 30px;
+	width: 100%;
+	border-radius: 30px;
+}
+
+.join-error {
+	color: #ed4245;
+	font-size: 14px;
+	margin-top: -8px;
+	margin-bottom: 8px;
+	text-align: center;
+}
+
+.hidden {
+	display: none !important;
 }
 
 .glow {
-    /* font-size: 80px; */
-    color: #fff;
-    text-align: center;
-    -webkit-animation: glow 1s ease-in-out infinite alternate;
-    -moz-animation: glow 1s ease-in-out infinite alternate;
-    animation: glow 1s ease-in-out infinite alternate;
-  }
-  
-  @-webkit-keyframes glow {
-    from {
-      text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #d13737, 0 0 40px #d13737, 0 0 50px #d13737, 0 0 60px #d13737, 0 0 70px #d13737;
-    }
-    
-    to {
-      text-shadow: 0 0 20px #fff, 0 0 30px #00eb00, 0 0 40px #00eb00, 0 0 50px #00eb00, 0 0 60px #00eb00, 0 0 70px #00eb00, 0 0 80px #00eb00;
-    }
+	color: #fff;
+	text-align: center;
+	animation: glow 1s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+	from {
+		text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #d13737, 0 0 40px #d13737, 0 0 50px #d13737, 0 0 60px #d13737, 0 0 70px #d13737;
+	}
+	to {
+		text-shadow: 0 0 20px #fff, 0 0 30px #00eb00, 0 0 40px #00eb00, 0 0 50px #00eb00, 0 0 60px #00eb00, 0 0 70px #00eb00, 0 0 80px #00eb00;
+	}
+}
+
+@media (max-width: 600px) {
+	.join-main {
+		padding: 30px 24px;
+	}
 }
