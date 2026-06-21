@@ -11,7 +11,7 @@ Realtime chat app with WebSockets (Socket.io), Node.js, Express, and MongoDB.
 ## Features
 
 - Real-time messaging with room-based chat
-- Message history (last 50 messages per room, 60-day TTL)
+- Message history (last 50 messages per room, 7-day TTL)
 - Typing indicators, live room directory with online counts
 - Reconnection handling, mobile sidebar drawer
 - Message bubbles (own vs others), bot/system messages

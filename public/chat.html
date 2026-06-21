@@ -9,14 +9,11 @@
       integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
       crossorigin="anonymous"
     />
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500&display=swap');
-    </style>
     <link rel="stylesheet" href="css/style.css" />
     <title>COE Messaging App</title>
     <link rel="icon" href="https://lh3.googleusercontent.com/pw/ACtC-3eOodNS4-awUVy4mwQlpp3SFQwP8vV6dacl4GKvCl-MR6tOrVpBa5BNvpPeCvRwnq0yo-M0By4Eru6f1dQr4jBDehRVNiPwkUQn3I3qiEA2eII7vhM95QENm1-R1UMtu3rlgdcr0dTSi3nWjcsrE1k9=w480-h512-no?authuser=1" type="image/icon type">
   </head>
-  <body>
+  <body class="chat-page">
     <div id="connection-banner" class="connection-banner hidden" role="status"></div>
 
     <div class="chat-container">
@@ -58,13 +55,13 @@
           <input
             id="msg"
             type="text"
-            placeholder="Type a message (max 500 chars)"
+            placeholder="Start typing ..."
             maxlength="500"
             required
             autocomplete="off"
             autofocus
           />
-          <button type="submit" class="btn send-btn" aria-label="Send message"><i class="fas fa-paper-plane"></i></button>
+          <button type="submit" class="btn send-btn" aria-label="Send message">✈</button>
         </form>
       </div>
     </div>

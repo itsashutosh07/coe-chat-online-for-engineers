@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Color Lab</title>
+    <link rel="stylesheet" href="lab.css" />
+    <style id="panel-preview-vars"></style>
+  </head>
+  <body class="lab-body">
+    <header class="lab-header">
+      <div class="lab-header-brand">
+        <h1>Chat Color Lab</h1>
+        <p>
+          Live preview of the chat app
+        </p>
+      </div>
+      <div class="lab-actions">
+        <button type="button" id="btn-undo" class="lab-btn" disabled title="Undo (Ctrl+Z)">Undo</button>
+        <button type="button" id="btn-redo" class="lab-btn" disabled title="Redo (Ctrl+Shift+Z)">Redo</button>
+        <button type="button" id="btn-reset" class="lab-btn">Reset to Deep Purple</button>
+        <button type="button" id="btn-copy-json" class="lab-btn lab-btn--primary">Copy JSON Config</button>
+      </div>
+    </header>
+
+    <div class="lab-layout">
+      <aside class="lab-sidebar">
+        <div class="lab-sidebar-header">
+          <h2>Color tokens</h2>
+          <p>Adjust any value — preview updates live</p>
+        </div>
+        <div class="lab-sidebar-scroll">
+          <div id="controls-root"></div>
+        </div>
+        <section class="lab-export">
+          <h2>Exported JSON</h2>
+          <p class="lab-export-hint">Paste back to apply to the main chat app</p>
+          <textarea id="json-output" readonly spellcheck="false"></textarea>
+          <div class="lab-export-actions">
+            <button type="button" id="btn-select-all" class="lab-btn">Select All</button>
+            <button type="button" id="btn-refresh-json" class="lab-btn">Refresh</button>
+          </div>
+          <p id="export-status" class="lab-status" role="status"></p>
+        </section>
+      </aside>
+
+      <main class="lab-main">
+        <div class="lab-preview-toolbar">
+          <span class="lab-preview-label">Live preview</span>
+          <div class="lab-mock-options">
+            <label><input type="radio" name="banner-preview" value="none" checked /> No banner</label>
+            <label><input type="radio" name="banner-preview" value="error" /> Error banner</label>
+            <label><input type="radio" name="banner-preview" value="success" /> Success banner</label>
+          </div>
+        </div>
+        <div class="lab-preview-scroll">
+          <div id="panel-preview" class="chat-mock" data-panel="preview"></div>
+        </div>
+      </main>
+    </div>
+
+    <script src="tokens.js"></script>
+    <script src="lab.js"></script>
+  </body>
+</html>

@@ -33,25 +33,12 @@ let joined = false;
 
 const socket = io({ reconnection: true, reconnectionAttempts: Infinity });
 
-// Web Audio notification (replaces missing audio.mp3)
-let audioCtx = null;
+const audio = new Audio('audio.mp3');
 
-function playNotification(type = 'message') {
+function playNotification() {
   if (!soundEnabled) return;
-  try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.frequency.value = type === 'mention' ? 880 : 520;
-    gain.gain.value = 0.08;
-    osc.start();
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
-    osc.stop(audioCtx.currentTime + 0.15);
-  } catch (_) {
-    // Audio not available
-  }
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
 }
 
 function setConnectionBanner(text, type) {
@@ -176,11 +163,7 @@ function appendHistorySeparator() {
   chatMessages.appendChild(sep);
 }
 
-function escapeRegex(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function renderMessageText(textEl, text, currentUsername) {
+function renderMessageText(textEl, text) {
   textEl.textContent = '';
 
   const codeBlockRegex = /```([\s\S]*?)```/g;
@@ -191,7 +174,7 @@ function renderMessageText(textEl, text, currentUsername) {
   while ((match = codeBlockRegex.exec(text)) !== null) {
     hasCodeBlock = true;
     if (match.index > lastIndex) {
-      appendTextWithMentions(textEl, text.slice(lastIndex, match.index), currentUsername);
+      appendTextWithMentions(textEl, text.slice(lastIndex, match.index));
     }
     const pre = document.createElement('pre');
     const code = document.createElement('code');
@@ -203,15 +186,15 @@ function renderMessageText(textEl, text, currentUsername) {
 
   if (hasCodeBlock) {
     if (lastIndex < text.length) {
-      appendTextWithMentions(textEl, text.slice(lastIndex), currentUsername);
+      appendTextWithMentions(textEl, text.slice(lastIndex));
     }
     return;
   }
 
-  appendTextWithMentions(textEl, text, currentUsername);
+  appendTextWithMentions(textEl, text);
 }
 
-function appendTextWithMentions(container, text, currentUsername) {
+function appendTextWithMentions(container, text) {
   const mentionRegex = /@([a-zA-Z0-9_\-\s.]+)/g;
   let lastIndex = 0;
   let match;
@@ -232,22 +215,18 @@ function appendTextWithMentions(container, text, currentUsername) {
   }
 }
 
-function messageMentionsMe(text) {
-  const pattern = new RegExp(`@${escapeRegex(username)}\\b`, 'i');
-  return pattern.test(text);
-}
-
 function outputMessage(message, options = {}) {
   const { skipSound = false, skipScrollTrack = false } = options;
+
   const isBot = message.type === 'bot' || message.username === BOT_NAME;
-  const isOwn = !isBot && message.username.trim() === username.trim();
-  const mentionsMe = !isOwn && !isBot && messageMentionsMe(message.text);
+  const isOwn =
+    !isBot && message.username.trim().toLowerCase() === username.trim().toLowerCase();
 
   const div = document.createElement('div');
   div.classList.add('message');
   if (isBot) div.classList.add('message--bot');
   else if (isOwn) div.classList.add('message--own');
-  if (mentionsMe) div.classList.add('message--mention');
+  else div.classList.add('message--other');
 
   const meta = document.createElement('p');
   meta.classList.add('meta');
@@ -266,13 +245,13 @@ function outputMessage(message, options = {}) {
 
   const textEl = document.createElement('p');
   textEl.classList.add('text');
-  renderMessageText(textEl, message.text, username);
+  renderMessageText(textEl, message.text);
   div.appendChild(textEl);
 
   chatMessages.appendChild(div);
 
   if (!skipSound) {
-    playNotification(mentionsMe ? 'mention' : 'message');
+    playNotification();
   }
 
   if (!skipScrollTrack && !isNearBottom) {
@@ -296,6 +275,7 @@ function outputUsers(users) {
     li.textContent = user.username;
     userList.appendChild(li);
   });
+  playNotification();
 }
 
 function scrollToBottom(smooth = true) {
