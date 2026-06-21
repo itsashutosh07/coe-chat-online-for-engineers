@@ -1,147 +1,162 @@
-const path = require('path');
-const http = require('http');
-const express = require('express');
-const socketio = require('socket.io');
-const moment = require('moment');
-const mongoose = require('mongoose');
-// mongoose.connect('mongodb://AshutoshAdmin:abcd1234@ashutoshwebchatapp-shard-00-00.ovcla.mongodb.net:27017,ashutoshwebchatapp-shard-00-01.ovcla.mongodb.net:27017,ashutoshwebchatapp-shard-00-02.ovcla.mongodb.net:27017/?ssl=true&replicaSet=atlas-g8bqwp-shard-0&authSource=admin&retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true})
-mongoose.connect('mongodb+srv://AshutoshAdmin:abcd1234@ashutoshwebchatapp.cxwdkvk.mongodb.net/?retryWrites=true&w=majority&appName=ashutoshWebChatApp', {useNewUrlParser: true, useUnifiedTopology: true})
+require("dotenv").config();
 
-// console.log(mongoose.connection.readyState); //logs 0
-mongoose.connection.on('connecting', () => { 
-  console.log('connecting')
-  console.log(mongoose.connection.readyState); //logs 2
+const path = require("path");
+const http = require("http");
+const express = require("express");
+const socketio = require("socket.io");
+const moment = require("moment");
+const mongoose = require("mongoose");
+
+if (!process.env.MONGODB_URI) {
+  console.error("[DB] MONGODB_URI is not set");
+  process.exit(1);
+}
+
+const mongooseOptions = { useNewUrlParser: true, useUnifiedTopology: true };
+
+mongoose.connect(process.env.MONGODB_URI, mongooseOptions).catch((err) => {
+  console.error("[DB] Initial connection failed:", err.message);
 });
-mongoose.connection.on('connected', () => {
-  console.log('connected');
-  console.log(mongoose.connection.readyState); //logs 1
+
+mongoose.connection.on("connecting", () => {
+  console.log("connecting");
+  console.log(mongoose.connection.readyState);
 });
-mongoose.connection.on('disconnecting', () => {
-  console.log('disconnecting');
-  console.log(mongoose.connection.readyState); // logs 3
+mongoose.connection.on("connected", () => {
+  console.log("connected");
+  console.log(mongoose.connection.readyState);
 });
-mongoose.connection.on('disconnected', () => {
-  console.log('disconnected');
-  console.log(mongoose.connection.readyState); //logs 0
+mongoose.connection.on("error", (err) => {
+  console.error("[DB] Connection error:", err.message);
 });
-const userSchema = new mongoose.Schema(
-  {
-    id : String,
-    username : String,
-    room : String
-  }
-)
+mongoose.connection.on("disconnecting", () => {
+  console.log("disconnecting");
+  console.log(mongoose.connection.readyState);
+});
+mongoose.connection.on("disconnected", () => {
+  console.log("disconnected");
+  console.log(mongoose.connection.readyState);
+});
+
+const userSchema = new mongoose.Schema({
+  id: String,
+  username: String,
+  room: String,
+});
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 
-// Set static folder
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-const botName = 'C.O.E. Bot';
-
+const botName = "C.O.E. Bot";
 
 function formatMessage(username, text) {
   return {
     username,
     text,
-    time: moment().format('h:mm a')
+    time: moment().format("h:mm a"),
   };
 }
 
-// Run when client connects
-io.on('connection', socket => {
-
-  socket.on('joinRoom', ({ username, room }) => {
+io.on("connection", (socket) => {
+  socket.on("joinRoom", ({ username, room }) => {
     const newUser = new User({
-      id : socket.id,
+      id: socket.id,
       username: username,
-      room : room
-    })
+      room: room,
+    });
 
-    newUser.save(function(err,user){
+    newUser.save(function (err, user) {
+      if (err || !user) {
+        console.error(
+          "[DB] joinRoom save failed:",
+          err?.message || "user undefined",
+          { socketId: socket.id, username, room }
+        );
+        return;
+      }
+
       socket.join(user.room);
 
-      // Welcome current user
-      socket.emit('message', formatMessage(botName, 'Welcome to C.O.E. !!'));
+      socket.emit("message", formatMessage(botName, "Welcome to C.O.E. !!"));
 
-      // Broadcast when a user connects
       socket.broadcast
         .to(user.room)
         .emit(
-          'message',
+          "message",
           formatMessage(botName, `${user.username} has joined the chat`)
         );
 
-      // Send users and room info
-      // io.to(user.room).emit('roomUsers', {
-      //   room: user.room,
-      //   users: getRoomUsers(user.room)
-      // });
-
-      User.find({room : user.room}, function(err, res){
-        io.to(user.room).emit('roomUsers', {
-          room : user.room,
-          users : res
-        })
-      })
+      User.find({ room: user.room }, function (findErr, res) {
+        if (findErr) {
+          console.error("[DB] joinRoom list users failed:", findErr.message, {
+            room: user.room,
+          });
+          return;
+        }
+        io.to(user.room).emit("roomUsers", {
+          room: user.room,
+          users: res,
+        });
+      });
     });
-
-    })
-
-
-
-  // Listen for chatMessage
-  socket.on('chatMessage', msg => {
-    // console.log('Mesaage Aaya');
-    // const user = getCurrentUser(socket.id);
-
-    User.findOne({id : socket.id}, function(err, user){
-      if(err)
-      {
-        console.log(err);
-      }
-      else
-      {
-          // console.log(formatMessage(user.username,msg));
-          if(user){
-            io.to(user.room).emit('message', formatMessage(user.username, msg));
-
-          }
-          else{
-            socket.disconnect()
-          }
-
-      }
-    })
   });
 
-  // Runs when client disconnects
-  socket.on('disconnect', () => {
-
-    User.findOneAndDelete({id : socket.id }, function(err, user){
-      if(err){
-        console.log(err);
+  socket.on("chatMessage", (msg) => {
+    User.findOne({ id: socket.id }, function (err, user) {
+      if (err) {
+        console.error("[DB] chatMessage lookup failed:", err.message, {
+          socketId: socket.id,
+        });
+        return;
       }
-      else{
-        // return userFound;
-        io.to(user.room).emit(
-          'message',
-          formatMessage(botName, `${user.username} has left the chat`)
-        );
-
-        // Send users and room info
-        User.find({room : user.room}, function(err, res){
-          io.to(user.room).emit('roomUsers', {
-            room : user.room,
-            users : res
-          })
-        })
+      if (user) {
+        io.to(user.room).emit("message", formatMessage(user.username, msg));
+      } else {
+        console.error("[DB] chatMessage: no user for socket", {
+          socketId: socket.id,
+        });
+        socket.disconnect();
       }
-    })
+    });
+  });
 
+  socket.on("disconnect", () => {
+    User.findOneAndDelete({ id: socket.id }, function (err, user) {
+      if (err) {
+        console.error("[DB] disconnect delete failed:", err.message, {
+          socketId: socket.id,
+        });
+        return;
+      }
+      if (!user) {
+        console.error("[DB] disconnect: no user found for socket", {
+          socketId: socket.id,
+        });
+        return;
+      }
+
+      io.to(user.room).emit(
+        "message",
+        formatMessage(botName, `${user.username} has left the chat`)
+      );
+
+      User.find({ room: user.room }, function (findErr, res) {
+        if (findErr) {
+          console.error("[DB] disconnect list users failed:", findErr.message, {
+            room: user.room,
+          });
+          return;
+        }
+        io.to(user.room).emit("roomUsers", {
+          room: user.room,
+          users: res,
+        });
+      });
+    });
   });
 });
 
