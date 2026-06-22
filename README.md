@@ -6,7 +6,7 @@ Realtime chat app with WebSockets (Socket.io), Node.js, Express, and MongoDB.
 
 1. Ashutosh Jaiswal : 2019UCO1616
 2. Ayush Mishra : 2019UCO1617
-3. Kapish Garg : 2019UCO1617
+3. Kapish Garg : 2019UCO1618
 
 ## Features
 
